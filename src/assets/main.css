@@ -1,4 +1,15 @@
-@import './base.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #3d5a80;
+  --color-secondary: #98c1d9;
+  --color-tertiary: #e0fbfc;
+  --color-accent: #ee6c4d;
+}
+
+/* @import './base.css';
 
 #app {
   max-width: 1280px;
@@ -32,4 +43,4 @@ a,
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }
-}
+} */
