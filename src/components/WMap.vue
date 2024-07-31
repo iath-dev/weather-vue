@@ -10,7 +10,7 @@ const weather = useWeatherStore()
 </script>
 
 <template>
-  <section class="flex-1 rounded-lg">
+  <section class="flex-1 rounded-lg" v-if="weather.location">
     <l-map
       ref="map"
       :min-zoom="6"
