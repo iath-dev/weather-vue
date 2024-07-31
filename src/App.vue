@@ -1,86 +1,65 @@
 <script setup lang="ts">
-// import HelloWorld from './components/HelloWorld.vue'
-// import TheWelcome from './components/TheWelcome.vue'
-// import 'leaflet/dist/leaflet.css'
-// import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet'
-import { onBeforeMount, ref } from 'vue'
-import { weatherStore } from './stores/weather_store'
+import { useWeatherStore } from './stores/weather_store'
 import WMap from '@/components/WMap.vue'
+import { onMounted } from 'vue'
+import moment from 'moment'
 
-const zoom = ref(12)
+const weather = useWeatherStore()
 
-const weather = weatherStore()
-
-onBeforeMount(() => {
-  weather.onStart()
+onMounted(() => {
+  weather.init()
 })
 </script>
 
 <template>
-  <main class="container grid w-screen h-screen gap-4 mx-auto grid-row-4">
+  <main
+    v-if="weather.isLoading"
+    class="container flex flex-col w-screen h-screen mx-auto space-y-4"
+  >
+    <div class="h-24 rounded-b-lg bg-slate-100 animate-pulse"></div>
+    <div class="flex-1 rounded-lg bg-slate-100 animate-pulse"></div>
+    <div class="h-24 rounded-t-lg bg-slate-100 animate-pulse"></div>
+  </main>
+  <main v-else class="container flex flex-col w-screen h-screen gap-4 px-4 mx-auto">
+    <div class="flex justify-center space-x-6 item-center">
+      <div v-if="weather.weatherFormatted" class="flex items-center justify-center py-2 space-x-4">
+        <img :src="weather.weatherFormatted.icon" :alt="weather.weatherFormatted.description" />
+        <div class="flex flex-col">
+          <span class="text-lg font-semibold text-primary">{{
+            weather.weatherFormatted.city.name
+          }}</span>
+          <p class="text-sm font-tight">
+            {{ weather.weatherFormatted.temp }}
+            <span class="font-semibold text-primary"> &deg;F </span>
+          </p>
+        </div>
+      </div>
+    </div>
     <WMap></WMap>
-    <!-- <section class="row-span-3 rounded-lg">
-      <l-map
-        ref="map"
-        v-model:zoom="zoom"
-        :min-zoom="6"
-        :max-zoom="18"
-        v-model:center="weather.currentLocation"
-        :use-global-leaflet="false"
-        class="w-full h-full rounded-lg"
+    <section
+      v-if="weather.forecastFormatted != null && !weather.isLoading"
+      class="flex max-h-screen pb-2 space-x-4 overflow-y-auto"
+    >
+      <div
+        v-for="cast in weather.forecastFormatted!.list"
+        :key="cast.dt"
+        class="flex flex-col items-center justify-center p-6 space-y-2 rounded-lg shadow min-w-40 min-h-40 hover:shadow-lg aspect-square hover:bg-secondary/75"
       >
-        <l-marker v-if="weather.currentLocation !== null" :lat-lng="weather.currentLocation">
-        </l-marker>
-        <l-tile-layer
-          url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
-          layer-type="base"
-          name="Stadia Maps Basemap"
-        >
-        </l-tile-layer>
-      </l-map>
-    </section> -->
-    <section class="bg-secondary">
-      <!-- <div v-for="cast in weather.forecast"></div> -->
+        <div class="flex items-center justify-around space-x-2">
+          <img :src="cast.weather[0].icon" :alt="cast.weather[0].description" />
+          <span class="font-bold text-md text-primary">{{ cast.weather[0].main }}</span>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold">
+            {{ moment(cast.dt_txt).format('DD-MM-YY') }}
+          </h1>
+          <h1 class="text-sm font-bold text-primary">
+            {{ moment(cast.dt_txt).format('HH:mm:ss') }}
+          </h1>
+        </div>
+      </div>
     </section>
   </main>
-  <!-- <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main> -->
 </template>
 
-<style scoped>
-/* header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-} */
-</style>
+<style scoped></style>

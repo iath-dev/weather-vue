@@ -90,7 +90,7 @@ export interface Forecast {
   visibility: number
   pop: number
   sys: ListSys
-  dt_txt: Date
+  dt_txt: string
   rain?: Rain
 }
 
